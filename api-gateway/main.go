@@ -15,6 +15,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	otellog "go.opentelemetry.io/otel/log"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
@@ -92,7 +93,10 @@ func handleOrder(w http.ResponseWriter, r *http.Request) {
 
 	body, _ := io.ReadAll(r.Body)
 	// Log the incoming request
-	logger.Emit(ctx, "Order request received", attribute.String("body", string(body)))
+	var record otellog.Record
+	record.SetBody(otellog.StringValue("Order request received"))
+	record.AddAttributes(otellog.String("body", string(body)))
+	logger.Emit(ctx, record)
 
 	// Forward to order-service
 	orderServiceURL := os.Getenv("ORDER_SERVICE_URL")
@@ -132,7 +136,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
-func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Now) {
+func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Time) {
 	duration := float64(time.Since(start).Milliseconds())
 	attrs := []attribute.KeyValue{
 		attribute.String("route", route),

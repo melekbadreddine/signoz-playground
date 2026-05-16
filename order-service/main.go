@@ -17,6 +17,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	otellog "go.opentelemetry.io/otel/log"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
@@ -132,7 +133,10 @@ func handleOrder(w http.ResponseWriter, r *http.Request) {
 
 	// 2. Call notification-service
 	if err := callNotification(ctx, req); err != nil {
-		logger.Emit(ctx, "Notification failed", attribute.String("error", err.Error()))
+		var record otellog.Record
+		record.SetBody(otellog.StringValue("Notification failed"))
+		record.AddAttributes(otellog.String("error", err.Error()))
+		logger.Emit(ctx, record)
 		// We might still consider the order created even if notification fails
 	}
 
@@ -193,7 +197,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Now) {
+func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Time) {
 	duration := float64(time.Since(start).Milliseconds())
 	attrs := []attribute.KeyValue{
 		attribute.String("route", route),

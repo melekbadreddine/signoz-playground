@@ -13,6 +13,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	otellog "go.opentelemetry.io/otel/log"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
@@ -133,11 +134,14 @@ func handleReserve(w http.ResponseWriter, r *http.Request) {
 		attribute.Int64("stock_level", newLevel),
 	)
 
-	logger.Emit(ctx, "Stock reserved",
-		attribute.String("order_id", req.OrderID),
-		attribute.String("product_id", req.ProductID),
-		attribute.Int64("remaining_stock", newLevel),
+	var record otellog.Record
+	record.SetBody(otellog.StringValue("Stock reserved"))
+	record.AddAttributes(
+		otellog.String("order_id", req.OrderID),
+		otellog.String("product_id", req.ProductID),
+		otellog.Int64("remaining_stock", newLevel),
 	)
+	logger.Emit(ctx, record)
 
 	w.WriteHeader(http.StatusOK)
 	recordMetrics(ctx, "/reserve", r.Method, http.StatusOK, start)
@@ -147,7 +151,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Now) {
+func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Time) {
 	duration := float64(time.Since(start).Milliseconds())
 	attrs := []attribute.KeyValue{
 		attribute.String("route", route),

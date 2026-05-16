@@ -12,6 +12,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	otellog "go.opentelemetry.io/otel/log"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
@@ -94,10 +95,13 @@ func handleNotify(w http.ResponseWriter, r *http.Request) {
 	// Simulate latency
 	time.Sleep(100 * time.Millisecond)
 
-	logger.Emit(ctx, "Notification sent",
-		attribute.String("order_id", req.OrderID),
-		attribute.String("product_id", req.ProductID),
+	var record otellog.Record
+	record.SetBody(otellog.StringValue("Notification sent"))
+	record.AddAttributes(
+		otellog.String("order_id", req.OrderID),
+		otellog.String("product_id", req.ProductID),
 	)
+	logger.Emit(ctx, record)
 
 	w.WriteHeader(http.StatusOK)
 	recordMetrics(ctx, "/notify", r.Method, http.StatusOK, start)
@@ -107,7 +111,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Now) {
+func recordMetrics(ctx context.Context, route, method string, statusCode int, start time.Time) {
 	duration := float64(time.Since(start).Milliseconds())
 	attrs := []attribute.KeyValue{
 		attribute.String("route", route),
