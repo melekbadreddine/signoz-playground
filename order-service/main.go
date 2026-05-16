@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -118,10 +117,13 @@ func handleOrder(w http.ResponseWriter, r *http.Request) {
 		attribute.Int("quantity", req.Quantity),
 	)
 
-	logger.Emit(ctx, "Processing order",
-		attribute.String("order_id", req.OrderID),
-		attribute.String("product_id", req.ProductID),
+	var record otellog.Record
+	record.SetBody(otellog.StringValue("Processing order"))
+	record.AddAttributes(
+		otellog.String("order_id", req.OrderID),
+		otellog.String("product_id", req.ProductID),
 	)
+	logger.Emit(ctx, record)
 
 	// 1. Call inventory-service
 	if err := callInventory(ctx, req); err != nil {
