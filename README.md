@@ -29,15 +29,15 @@ git clone -b main https://github.com/SigNoz/signoz.git
 cd signoz/deploy/docker
 docker compose up -d
 ```
-This will start SigNoz and its OTel collector. By default, it creates a docker network called `clickhouse-setup_default`.
+This will start SigNoz and its OTel collector. By default, it usually creates a docker network called `signoz-net` or `clickhouse-setup_default`.
 
 ## Getting Started
 
 1. **Check the SigNoz network name**:
-   Run `docker network ls` to find the network created by SigNoz (likely `clickhouse-setup_default`).
+   Run `docker network ls` to find the network created by SigNoz (e.g., `signoz-net`).
    
 2. **Update `docker-compose.yml`**:
-   If the network name is different from `observability`, update the `external: true` name at the bottom of `docker-compose.yml`.
+   Ensure the `external: true` network name at the bottom of `docker-compose.yml` matches what you found in step 1. (Currently set to `signoz-net`).
 
 3. **Build and run the application**:
    ```bash

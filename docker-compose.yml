@@ -11,7 +11,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=signoz-otel-collector:4317
       - ORDER_SERVICE_URL=http://order-service:8001
     networks:
-      - observability
+      - signoz-net
 
   order-service:
     build: ./order-service
@@ -24,7 +24,7 @@ services:
       - INVENTORY_SERVICE_URL=http://inventory-service:8002
       - NOTIFICATION_SERVICE_URL=http://notification-service:8003
     networks:
-      - observability
+      - signoz-net
 
   inventory-service:
     build: ./inventory-service
@@ -35,7 +35,7 @@ services:
       - OTEL_SERVICE_NAME=inventory-service
       - OTEL_EXPORTER_OTLP_ENDPOINT=signoz-otel-collector:4317
     networks:
-      - observability
+      - signoz-net
 
   notification-service:
     build: ./notification-service
@@ -46,7 +46,7 @@ services:
       - OTEL_SERVICE_NAME=notification-service
       - OTEL_EXPORTER_OTLP_ENDPOINT=signoz-otel-collector:4317
     networks:
-      - observability
+      - signoz-net
 
   loadgen:
     build: ./loadgen
@@ -54,10 +54,10 @@ services:
     depends_on:
       - api-gateway
     networks:
-      - observability
+      - signoz-net
 
 networks:
-  observability:
+  signoz-net:
     external: true
 
 # NOTE: Before running 'docker compose up', make sure you have SigNoz running.
@@ -71,3 +71,4 @@ networks:
 # To install SigNoz:
 # git clone -b main https://github.com/SigNoz/signoz.git && cd signoz/deploy/
 # ./install.sh
+/install.sh
