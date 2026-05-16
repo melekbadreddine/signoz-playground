@@ -1,6 +1,6 @@
 module github.com/melek/signoz-playground/inventory-service
 
-go 1.23.0
+go 1.24.0
 
 require (
 	go.opentelemetry.io/otel v1.43.0
