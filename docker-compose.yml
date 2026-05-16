@@ -8,7 +8,7 @@ services:
       - "8000:8000"
     environment:
       - OTEL_SERVICE_NAME=api-gateway
-      - OTEL_EXPORTER_OTLP_ENDPOINT=signoz-otel-collector:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
       - ORDER_SERVICE_URL=http://order-service:8001
     networks:
       - signoz-net
@@ -20,7 +20,7 @@ services:
       - "8001:8001"
     environment:
       - OTEL_SERVICE_NAME=order-service
-      - OTEL_EXPORTER_OTLP_ENDPOINT=signoz-otel-collector:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
       - INVENTORY_SERVICE_URL=http://inventory-service:8002
       - NOTIFICATION_SERVICE_URL=http://notification-service:8003
     networks:
@@ -33,7 +33,7 @@ services:
       - "8002:8002"
     environment:
       - OTEL_SERVICE_NAME=inventory-service
-      - OTEL_EXPORTER_OTLP_ENDPOINT=signoz-otel-collector:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
     networks:
       - signoz-net
 
@@ -44,7 +44,7 @@ services:
       - "8003:8003"
     environment:
       - OTEL_SERVICE_NAME=notification-service
-      - OTEL_EXPORTER_OTLP_ENDPOINT=signoz-otel-collector:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
     networks:
       - signoz-net
 
