@@ -1,6 +1,6 @@
 module github.com/melek/signoz-playground/notification-service
 
-go 1.26.2
+go 1.23.0
 
 require (
 	go.opentelemetry.io/otel v1.43.0
